@@ -1,6 +1,7 @@
 # NAME
 
 Plack::Middleware::Errbit - Sends application errors to Errbit
+[![Build Status](https://travis-ci.org/taiyuf/Plack-Middleware-Errbit.png?branch=master)](https://travis-ci.org/taiyuf/Plack-Middleware-Errbit)
 
 # SYNOPSIS
 
