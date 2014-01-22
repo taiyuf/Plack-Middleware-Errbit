@@ -15,27 +15,25 @@ use File::Spec;
 use CPAN::Meta;
 use CPAN::Meta::Prereqs;
 
-my %args = (
-    license              => 'perl',
-    dynamic_config       => 0,
-
-    configure_requires => {
-        'Module::Build' => 0.38,
-    },
-
-    name            => 'Plack-Middleware-Errbit',
-    module_name     => 'Plack::Middleware::Errbit',
-    allow_pureperl => 0,
-
-    script_files => [glob('script/*'), glob('bin/*')],
-    c_source     => [qw()],
-    PL_files => {},
-
-    test_files           => ((-d '.git' || $ENV{RELEASE_TESTING}) && -d 'xt') ? 't/ xt/' : 't/',
-    recursive_test_files => 1,
-
-    
+my %args = (license              => 'perl',
+            dynamic_config       => 0,
+            configure_requires   => {'Module::Build' => 0.38,},
+            name                 => 'Plack-Middleware-Errbit',
+            module_name          => 'Plack::Middleware::Errbit',
+            allow_pureperl       => 0,
+            script_files         => [glob('script/*'), glob('bin/*')],
+            c_source             => [qw()],
+            PL_files             => {},
+            test_files           => ((-d '.git' || $ENV{RELEASE_TESTING}) && -d 'xt') ? 't/ xt/' : 't/',
+            recursive_test_files => 1,
+            requires             => {"Devel::StackTrace" => 0,
+                                     "Try::Tiny" => 0,
+                                     "Plack::Util::Accessor" => 0,
+                                     "AnyEvent::HTTP" => 0,
+                                     "XML::Generator" => 0,
+                                     "Plack::Request" => 0,},
 );
+
 if (-d 'share') {
     $args{share_dir} = 'share';
 }
@@ -53,13 +51,14 @@ my $builder = Module::Build->subclass(
 )->new(%args);
 $builder->create_build_script();
 
-my $mbmeta = CPAN::Meta->load_file('MYMETA.json');
-my $meta = CPAN::Meta->load_file('META.json');
+my $mbmeta       = CPAN::Meta->load_file('MYMETA.json');
+my $meta         = CPAN::Meta->load_file('META.json');
 my $prereqs_hash = CPAN::Meta::Prereqs->new(
     $meta->prereqs
 )->with_merged_prereqs(
     CPAN::Meta::Prereqs->new($mbmeta->prereqs)
 )->as_string_hash;
+
 my $mymeta = CPAN::Meta->new(
     {
         %{$meta->as_struct},
