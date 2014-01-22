@@ -11,7 +11,6 @@ script:
   - prove -lr t
 after_success:
   - cover -report coveralls
-before_install:
-  - perlbrew install-cpanm -f
 install:
-  - (cpanm --installdeps --with-develop -nq .) | cat ~/.cpanm/build.log
+  - "cpanm --notest Module::Build ExtUtils::ParseXS"
+  - "cpanm --with-recommends --with-suggests --installdeps --notest ."
