@@ -26,12 +26,13 @@ my %args = (license              => 'perl',
             PL_files             => {},
             test_files           => ((-d '.git' || $ENV{RELEASE_TESTING}) && -d 'xt') ? 't/ xt/' : 't/',
             recursive_test_files => 1,
-            requires             => {"Devel::StackTrace" => 0,
-                                     "Try::Tiny" => 0,
+            requires             => {"Devel::StackTrace"     => 0,
+                                     "Try::Tiny"             => 0,
                                      "Plack::Util::Accessor" => 0,
-                                     "AnyEvent::HTTP" => 0,
-                                     "XML::Generator" => 0,
-                                     "Plack::Request" => 0,},
+                                     "Plack::Middleware"     => 0,
+                                     "AnyEvent::HTTP"        => 0,
+                                     "XML::Generator"        => 0,
+                                     "Plack::Request"        => 0,},
 );
 
 if (-d 'share') {
