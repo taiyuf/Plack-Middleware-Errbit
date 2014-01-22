@@ -10,7 +10,7 @@ use Devel::StackTrace;
 use Try::Tiny;
 use Plack::Util::Accessor qw(api_key host port);
 
-use AnyEvent::HTTP ();
+use AnyEvent::HTTP;
 use XML::Generator;
 use Plack::Request;
 

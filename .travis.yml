@@ -1,0 +1,17 @@
+language: perl
+perl:
+  - 5.12
+  - 5.14
+  - 5.16
+  - 5.18
+notifications:
+  email:
+    - tf.900913@gmail.com
+script:
+  - prove -lr xt
+after_success:
+  - cover -report coveralls
+before_install:
+  - perlbrew install-cpanm -f
+install:
+  - (cpanm --installdeps --with-develop -nq .) | cat ~/.cpanm/build.log

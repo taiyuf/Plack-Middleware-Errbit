@@ -1,0 +1,13 @@
+MYMETA.*
+META.yml
+!META.json
+.carton/
+.cpanm/
+local/
+cpanfile.snapshot
+/carton-*
+/.build
+/vendor
+Build
+blib
+_build/
