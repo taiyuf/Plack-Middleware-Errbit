@@ -11,7 +11,9 @@ Plack::Middleware::Errbit - Sends application errors to Errbit
 
 # DESCRIPTION
 
-This middleware catches exceptions (run-time errors) happening in your application and sends them to <Hoptoad>.
+This middleware catches exceptions (run-time errors) happening in your application and sends them to <Errbit>.
+
+Original: [Plack::Middleware::Hoptoad](https://github.com/miyagawa/Plack-Middleware-Hoptoad)
 
 
 # LICENSE
@@ -20,4 +22,4 @@ This library is free software; you can redistribute it and/or modify it under th
 
 # SEE ALSO
 
-Plack::Middleware::StackTrace
+- [Plack::Middleware::Hoptoad](https://github.com/miyagawa/Plack-Middleware-Hoptoad)
