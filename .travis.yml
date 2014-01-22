@@ -9,8 +9,6 @@ notifications:
     - tf.900913@gmail.com
 script:
   - prove -lr t
-after_success:
-  - cover -report coveralls
 install:
   - "cpanm --notest Module::Build ExtUtils::ParseXS"
   - "cpanm --with-recommends --with-suggests --installdeps --notest ."
