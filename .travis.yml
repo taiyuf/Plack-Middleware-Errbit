@@ -8,7 +8,7 @@ notifications:
   email:
     - tf.900913@gmail.com
 script:
-  - prove -lr xt
+  - prove -lr t
 after_success:
   - cover -report coveralls
 before_install:
