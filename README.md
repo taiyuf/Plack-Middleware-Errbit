@@ -3,7 +3,7 @@ Plack::Middleware::Errbit
 
 # NAME
 
-Plack::Middleware::Hoptoad - Sends application errors to Hoptoad
+Plack::Middleware::Errbit - Sends application errors to Errbit
 
 # SYNOPSIS
 
