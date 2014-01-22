@@ -11,6 +11,8 @@ Plack::Middleware::Errbit - Sends application errors to Errbit
 This middleware catches exceptions (run-time errors) happening in your
 application and sends them to [Errbit](https://github.com/errbit/errbit).
 
+Original: [Plack::Middleware::Hoptoad](https://github.com/miyagawa/Plack-Middleware-Hoptoad)
+
 # AUTHOR
 
 Taiyu Fujii
@@ -22,4 +24,4 @@ it under the same terms as Perl itself.
 
 # SEE ALSO
 
-[Plack::Middleware::StackTrace](https://metacpan.org/pod/Plack::Middleware::StackTrace)
+- [Plack::Middleware::Hoptoad](https://github.com/miyagawa/Plack-Middleware-Hoptoad)
