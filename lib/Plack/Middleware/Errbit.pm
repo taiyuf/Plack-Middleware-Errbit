@@ -8,11 +8,13 @@ our $VERSION = "0.01";
 use parent qw(Plack::Middleware);
 use Devel::StackTrace;
 use Try::Tiny;
-use Plack::Util::Accessor qw(api_key host port);
+use Plack::Util::Accessor qw(api_key host port path);
 
 use AnyEvent::HTTP;
 use XML::Generator;
 use Plack::Request;
+
+use Data::Dumper;
 
 sub call {
     my($self, $env) = @_;
@@ -42,26 +44,33 @@ sub call {
 sub send_exception {
     my($self, $trace, $exception, $env) = @_;
 
-    my $req = Plack::Request->new($env);
-
-    my $error  = $trace->frame(1);
-    my @frames = $trace->frames;
-    shift @frames;
-
+    my $req                = Plack::Request->new($env);
     my $api_key            = "api-key";
     my $cgi_data           = "cgi-data";
     my $server_environment = "server-environment";
     my $project_root       = "project-root";
     my $environment_name   = "environment-name";
     my $port               = $self->port ? ':' . $self->port : '';
-    my $uri                = $self->host . $port . '/notifier_api/v2/notices';
+    my $path               = $self->path || '/notifier_api/v2/notices';
+    my $uri                = $self->host . $port . $path;
+    my $error              = $trace->frame(1);
+    my @frames             = $trace->frames;
+    my $x                  = XML::Generator->new;
 
-    my $x = XML::Generator->new;
+    # warn "frames  : " . Dumper @frames;
+    # shift @frames;
 
-    my $var_dump = sub {
-        my $hash = shift;
-        map $x->var({ key => $_ }, $hash->{$_}), keys %$hash;
-    };
+
+    # my $var_dump = sub {
+    #     my $hash = shift;
+    #     map $x->var({ key => $_ }, $hash->{$_}), keys %$hash;
+    # };
+
+    # warn "var_dump: " . Dumper $var_dump;
+    # warn "request : " . Dumper $req;
+    # my %params;
+    # $params{'REQUEST_METHOD'} = $req->{env}->{'REQUEST_METHOD'};
+    # $params{'QUERY_STRINGS'}  = $req->{env}->{'QUERY_STRINGS'};
 
     my $xml = $x->notice(
         { version => '2.0' },
@@ -69,7 +78,7 @@ sub send_exception {
         $x->notifier(
             $x->name(__PACKAGE__),
             $x->version($VERSION),
-            $x->url("http://search.cpan.org/dist/Plack-Middleware-Errbit"),
+            $x->url("https://github.com/taiyuf/Plack-Middleware-Errbit"),
         ),
         $x->error(
             $x->class(ref($exception) || "Perl"),
@@ -83,20 +92,19 @@ sub send_exception {
             ),
         ),
         $x->request(
-            $x->url($req->uri->as_string),
-            $x->component(''),
-            $x->action($req->uri->path),
-            $x->$cgi_data( $var_dump->($env) ), # filter?
-            ( keys %{$req->parameters}    ? $var_dump->($req->parameters) : () ),
-            ( keys %{$req->session || {}} ? $var_dump->($req->session) : () ),
-        ),
-        $x->$server_environment(
-            $x->$project_root("/"),
-            $x->$environment_name($ENV{PLACK_ENV} || 'development'),
-        ),
+                    $x->url($req->uri->as_string),
+                    $x->component(''),
+                    $x->action($req->uri->path),
+                    $x->session($req->{env}->{'psgix.session'}),
+                    # $x->params(\%params),
+                    $x->$cgi_data($req->{env}),
+                   ),
+        $x->$server_environment($x->$project_root("/"),
+                                $x->$environment_name($ENV{PLACK_ENV} || 'development'), 
+                               ),
     );
 
-    warn "xml: " . $xml;
+    # warn "xml: " . $xml;
 
     my $cv = AE::cv;
 
@@ -123,7 +131,6 @@ Plack::Middleware::Errbit - Sends application errors to Errbit
 This middleware catches exceptions (run-time errors) happening in your
 application and sends them to L<Errbit|https://github.com/errbit/errbit>.
 
-Original: https://github.com/miyagawa/Plack-Middleware-Hoptoad
 
 
 =head1 AUTHOR
@@ -137,6 +144,7 @@ it under the same terms as Perl itself.
 
 =head1 SEE ALSO
 
+L<Plack::Middleware::Hoptoad>
 L<Plack::Middleware::StackTrace>
 
 =cut
