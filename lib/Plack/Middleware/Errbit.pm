@@ -71,8 +71,9 @@ sub send_exception {
     my ($pkg, );
 
     foreach my $f (@frames) {
-        next if $f->{subroutine} eq __PACKAGE__ . '__ANON__';
-        $pkg = $f->{package};
+        warn "subroutine: " . $f->{subroutine};
+        next if $f->{subroutine} eq __PACKAGE__ . '::__ANON__';
+        $pkg = $f->{package} and last;
     }
 
 
@@ -90,36 +91,29 @@ sub send_exception {
     # $params{'QUERY_STRINGS'}  = $req->{env}->{'QUERY_STRINGS'};
 
     my $xml = $x->notice(
-        { version => '2.0' },
-        $x->$api_key($self->api_key),
-        $x->notifier(
-            $x->name(__PACKAGE__),
-            $x->version($VERSION),
-            $x->url("https://github.com/taiyuf/Plack-Middleware-Errbit"),
-        ),
-        $x->error(
-            $x->class(ref($exception) || "Perl"),
-            $x->message("$exception"),
-            $x->backtrace(
-                map $x->line({
-                    method => $_->subroutine,
-                    file   => $_->filename,
-                    number => $_->line,
-                }), @frames
-            ),
-        ),
-        $x->request(
-                    $x->url($req->uri->as_string),
-                    $x->component(''),
-                    $x->action($req->uri->path),
-                    $x->session($req->{env}->{'psgix.session'}),
-                    $x->params($req->{env}->{'plack.request.http.body'}->{param}),
-                    $x->$cgi_data($req->{env}),
-                   ),
-        $x->$server_environment($x->$project_root("/"),
-                                $x->$environment_name($ENV{PLACK_ENV} || 'development'), 
-                               ),
-    );
+                         { version => '2.0' },
+                         $x->$api_key($self->api_key),
+                         $x->notifier($x->name(__PACKAGE__),
+                                      $x->version($VERSION),
+                                      $x->url("https://github.com/taiyuf/Plack-Middleware-Errbit"),),
+                         $x->error(# $x->class(ref($exception) || "Perl"),
+                                   $x->class($pkg || "Perl"),
+                                   $x->message("$exception"),
+                                   $x->backtrace(map $x->line({method => $_->subroutine,
+                                                               file   => $_->filename,
+                                                               number => $_->line,
+                                                              }), @frames
+                                                ),),
+                         $x->request($x->url($req->uri->as_string),
+                                     $x->component(''),
+                                     $x->action($req->uri->path),
+                                     $x->session($req->{env}->{'psgix.session'}),
+                                     $x->params($req->{env}->{'plack.request.http.body'}->{param}),
+                                     $x->$cgi_data($req->{env}),
+                                    ),
+                         $x->$server_environment($x->$project_root("/"),
+                                                 $x->$environment_name($ENV{PLACK_ENV} || 'development'),),
+                        );
 
     # warn "xml: " . $xml;
 
