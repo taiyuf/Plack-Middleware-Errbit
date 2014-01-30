@@ -9,12 +9,17 @@ use parent qw(Plack::Middleware);
 use Devel::StackTrace;
 use Try::Tiny;
 use Plack::Util::Accessor qw(api_key host port path);
-
 use AnyEvent::HTTP;
 use XML::Generator;
 use Plack::Request;
-
 use Data::Dumper;
+
+    ## Todo
+    #
+    # Summary: Error Class
+    # Summary: Where
+    # Parameters
+    #
 
 sub call {
     my($self, $env) = @_;
@@ -57,8 +62,18 @@ sub send_exception {
     my @frames             = $trace->frames;
     my $x                  = XML::Generator->new;
 
-    # warn "frames  : " . Dumper @frames;
-    # shift @frames;
+
+    warn "frames  : " . Dumper @frames;
+    warn "exception : " . Dumper $exception;
+
+    shift @frames;
+
+    my ($pkg, );
+
+    foreach my $f (@frames) {
+        next if $f->{subroutine} eq __PACKAGE__ . '__ANON__';
+        $pkg = $f->{package};
+    }
 
 
     # my $var_dump = sub {
@@ -67,7 +82,7 @@ sub send_exception {
     # };
 
     # warn "var_dump: " . Dumper $var_dump;
-    # warn "request : " . Dumper $req;
+    warn "request : " . Dumper $req;
     # my %params;
     # $params{'REQUEST_METHOD'} = $req->{env}->{'REQUEST_METHOD'};
     # $params{'QUERY_STRINGS'}  = $req->{env}->{'QUERY_STRINGS'};
@@ -96,7 +111,7 @@ sub send_exception {
                     $x->component(''),
                     $x->action($req->uri->path),
                     $x->session($req->{env}->{'psgix.session'}),
-                    # $x->params(\%params),
+                    $x->params($req->{env}->{'plack.request.http.body'}->{param}),
                     $x->$cgi_data($req->{env}),
                    ),
         $x->$server_environment($x->$project_root("/"),
