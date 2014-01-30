@@ -62,60 +62,42 @@ sub send_exception {
     my @frames             = $trace->frames;
     my $x                  = XML::Generator->new;
 
-
-    # warn "frames  : " . Dumper @frames;
+    # for debug
+    # warn "frames  : " .   Dumper @frames;
     # warn "exception : " . Dumper $exception;
+    # warn "request : " .   Dumper $req;
 
     shift @frames;
 
-    my ($pkg, );
+    my ($pkg, $xml,);
 
     foreach my $f (@frames) {
-        warn "subroutine: " . $f->{subroutine};
         next if $f->{subroutine} eq __PACKAGE__ . '::__ANON__';
         $pkg = $f->{package} and last;
     }
 
-
-    # my $var_dump = sub {
-    #     my $hash = shift;
-    #     map $x->var({ key => $_ }, $hash->{$_}), keys %$hash;
-    # };
-
-    # warn "var_dump: " . Dumper $var_dump;
-
-    # warn "request : " . Dumper $req;
-
-    # my %params;
-    # $params{'REQUEST_METHOD'} = $req->{env}->{'REQUEST_METHOD'};
-    # $params{'QUERY_STRINGS'}  = $req->{env}->{'QUERY_STRINGS'};
-
-    my $xml = $x->notice(
-                         { version => '2.0' },
-                         $x->$api_key($self->api_key),
-                         $x->notifier($x->name(__PACKAGE__),
-                                      $x->version($VERSION),
-                                      $x->url("https://github.com/taiyuf/Plack-Middleware-Errbit"),),
-                         $x->error(# $x->class(ref($exception) || "Perl"),
-                                   $x->class($pkg || "Perl"),
-                                   $x->message("$exception"),
-                                   $x->backtrace(map $x->line({method => $_->subroutine,
-                                                               file   => $_->filename,
-                                                               number => $_->line,
-                                                              }), @frames
-                                                ),),
-                         $x->request($x->url($req->uri->as_string),
-                                     $x->component(''),
-                                     $x->action($req->uri->path),
-                                     $x->session($req->{env}->{'psgix.session'}),
-                                     $x->params($req->{env}->{'plack.request.http.body'}->{param}),
-                                     $x->$cgi_data($req->{env}),
-                                    ),
-                         $x->$server_environment($x->$project_root("/"),
-                                                 $x->$environment_name($ENV{PLACK_ENV} || 'development'),),
-                        );
-
-    # warn "xml: " . $xml;
+    $xml = $x->notice(
+                      {version => '2.0'},
+                      $x->$api_key($self->api_key),
+                      $x->notifier($x->name(__PACKAGE__),
+                                   $x->version($VERSION),
+                                   $x->url("https://github.com/taiyuf/Plack-Middleware-Errbit"),),
+                      $x->error( # $x->class(ref($exception) || "Perl"),
+                                $x->class($pkg || "Perl"),
+                                $x->message("$exception"),
+                                $x->backtrace(map $x->line({method => $_->subroutine,
+                                                            file   => $_->filename,
+                                                            number => $_->line,
+                                                           }), @frames),),
+                      $x->request($x->url($req->uri->as_string),
+                                  $x->component(' '),
+                                  $x->action($req->uri->path),
+                                  $x->session($req->{env}->{'psgix.session'}),
+                                  $x->params($req->{env}->{'plack.request.http.body'}->{param}),
+                                  $x->$cgi_data($req->{env}),),
+                      $x->$server_environment($x->$project_root("/"),
+                                              $x->$environment_name($ENV{PLACK_ENV} || 'development'),),
+                     );
 
     my $cv = AE::cv;
 
