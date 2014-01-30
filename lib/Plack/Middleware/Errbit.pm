@@ -18,7 +18,7 @@ use Data::Dumper;
     #
     # Summary: Error Class
     # Summary: Where
-    # Parameters
+    # Parameters <-- need to check
     #
 
 sub call {
@@ -63,8 +63,8 @@ sub send_exception {
     my $x                  = XML::Generator->new;
 
 
-    warn "frames  : " . Dumper @frames;
-    warn "exception : " . Dumper $exception;
+    # warn "frames  : " . Dumper @frames;
+    # warn "exception : " . Dumper $exception;
 
     shift @frames;
 
@@ -82,7 +82,9 @@ sub send_exception {
     # };
 
     # warn "var_dump: " . Dumper $var_dump;
-    warn "request : " . Dumper $req;
+
+    # warn "request : " . Dumper $req;
+
     # my %params;
     # $params{'REQUEST_METHOD'} = $req->{env}->{'REQUEST_METHOD'};
     # $params{'QUERY_STRINGS'}  = $req->{env}->{'QUERY_STRINGS'};
