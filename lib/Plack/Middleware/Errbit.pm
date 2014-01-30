@@ -16,9 +16,9 @@ use Data::Dumper;
 
     ## Todo
     #
-    # Summary: Error Class
-    # Summary: Where
-    # Parameters <-- need to check
+    # Summary: Error Class <-- need to check
+    # Summary: Where       <-- need to check
+    # Parameters           <-- need to check
     #
 
 sub call {
@@ -90,7 +90,7 @@ sub send_exception {
                                                             number => $_->line,
                                                            }), @frames),),
                       $x->request($x->url($req->uri->as_string),
-                                  $x->component(' '),
+                                  $x->component($pkg),
                                   $x->action($req->uri->path),
                                   $x->session($req->{env}->{'psgix.session'}),
                                   $x->params($req->{env}->{'plack.request.http.body'}->{param}),
