@@ -1,8 +1,9 @@
 # NAME
 
+[![Build Status](https://travis-ci.org/taiyuf/Plack-Middleware-Errbit.png?branch=master)](https://travis-ci.org/taiyuf/Plack-Middleware-Errbit)
+
 Plack::Middleware::Errbit - Sends application errors to Errbit.
 
-[![Build Status](https://travis-ci.org/taiyuf/Plack-Middleware-Errbit.png?branch=master)](https://travis-ci.org/taiyuf/Plack-Middleware-Errbit)
 
 # SYNOPSIS
 
@@ -14,6 +15,8 @@ Plack::Middleware::Errbit - Sends application errors to Errbit.
 
 This middleware catches exceptions (run-time errors) happening in your
 application and sends them to [Errbit](https://github.com/errbit/errbit).
+
+and may sends to [airbrake](https://airbrake.io/). (I did not test.)
 
 
 # AUTHOR
