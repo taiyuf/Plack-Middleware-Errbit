@@ -3,7 +3,7 @@ package Plack::Middleware::Errbit;
 use strict;
 use warnings;
 use 5.008_001;
-our $VERSION = "0.01";
+our $VERSION = "0.02";
 
 use parent qw(Plack::Middleware);
 use Devel::StackTrace;
@@ -23,15 +23,14 @@ use Data::Dumper;
 
 sub call {
     my($self, $env) = @_;
-
+    my $res         = try { $self->app->($env) };
     my($trace, $exception);
+
     local $SIG{__DIE__} = sub {
         $trace = Devel::StackTrace->new;
         $exception = $_[0];
         die @_;
     };
-
-    my $res = try { $self->app->($env) };
 
     if ($trace && (!$res or $res->[0] == 500)) {
         $self->send_exception($trace, $exception, $env);
@@ -61,6 +60,7 @@ sub send_exception {
     my $error              = $trace->frame(1);
     my @frames             = $trace->frames;
     my $x                  = XML::Generator->new;
+    my ($pkg, $xml,);
 
     # for debug
     # warn "frames  : " .   Dumper @frames;
@@ -68,8 +68,6 @@ sub send_exception {
     # warn "request : " .   Dumper $req;
 
     shift @frames;
-
-    my ($pkg, $xml,);
 
     foreach my $f (@frames) {
         next if $f->{subroutine} eq __PACKAGE__ . '::__ANON__';
@@ -117,14 +115,14 @@ Plack::Middleware::Errbit - Sends application errors to Errbit
 
 =head1 SYNOPSIS
 
-  enable "Errbit", api_key => "...", host => "...", port => "...";
+  enable "Errbit", api_key => "...", host => "...", port => "...", path => "...";
+
+  the default value of path is "/notifier_api/v2/notices".
 
 =head1 DESCRIPTION
 
 This middleware catches exceptions (run-time errors) happening in your
 application and sends them to L<Errbit|https://github.com/errbit/errbit>.
-
-
 
 =head1 AUTHOR
 
@@ -137,7 +135,7 @@ it under the same terms as Perl itself.
 
 =head1 SEE ALSO
 
-L<Plack::Middleware::Hoptoad>
-L<Plack::Middleware::StackTrace>
+L<Plack::Middleware::Hoptoad|https://github.com/miyagawa/Plack-Middleware-Hoptoad>
+L<Plack::Middleware::StackTrace|http://search.cpan.org/~miyagawa/Plack-1.0030/lib/Plack/Middleware/StackTrace.pm>
 
 =cut
